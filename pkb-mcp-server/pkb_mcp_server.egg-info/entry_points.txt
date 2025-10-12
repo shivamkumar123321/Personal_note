@@ -1,0 +1,2 @@
+[console_scripts]
+pkb-mcp-server = pkbs_mcp_server.server:main

@@ -1,0 +1,8 @@
+{
+  "database_path": "pkb.db",
+  "server_host": "127.0.0.1",
+  "server_port": 8080,
+  "max_notes_per_search": 50,
+  "auto_backup": true,
+  "backup_interval_minutes": 60
+}

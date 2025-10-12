@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "pkb": {
+      "command": "python",
+      "args": [
+        "-m",
+        "pkbs_mcp_server.server"
+      ],
+      "cwd": "C:\\Users\\shiva\\OneDrive\\Desktop\\Personal_note\\pkb-mcp-server",
+      "env": {}
+    }
+  }
+}

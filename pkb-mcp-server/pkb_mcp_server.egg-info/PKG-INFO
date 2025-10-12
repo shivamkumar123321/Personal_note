@@ -1,0 +1,258 @@
+Metadata-Version: 2.4
+Name: pkb-mcp-server
+Version: 1.0.0
+Summary: An MCP server for managing a personal knowledge base
+Home-page: https://github.com/your-username/pkb-mcp-server
+Author: PKB MCP Server
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: mcp[cli]>=0.6.0
+Requires-Dist: pydantic>=1.10.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# Personal Knowledge Base MCP Server
+
+An MCP (Model Context Protocol) server that manages a local knowledge base with notes, tags, and search capabilities.
+
+## Features
+
+- Create, read, update, and delete markdown notes
+- Tag system for organizing notes
+- Full-text search across all notes (title and content)
+- Automatic link detection between notes (future feature)
+- Export notes to different formats (future feature)
+- MCP-compliant resources, tools, and prompts
+
+## Installation
+
+1. Clone the repository or download the source code:
+```bash
+git clone <repository-url>
+cd pkb-mcp-server
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+## Configuration
+
+The server can be configured using the `config.json` file:
+
+```json
+{
+  "database_path": "pkb.db",
+  "server_host": "127.0.0.1",
+  "server_port": 8080,
+  "max_notes_per_search": 50,
+  "auto_backup": true,
+  "backup_interval_minutes": 60
+}
+```
+
+Configuration options:
+- `database_path`: Path to the SQLite database file
+- `server_host`: Host address to bind the server to
+- `server_port`: Port to run the server on
+- `max_notes_per_search`: Maximum number of notes to return in search results
+- `auto_backup`: Whether to automatically create backups
+- `backup_interval_minutes`: How often to create backups (in minutes)
+
+## Running the Server
+
+To start the server:
+
+```bash
+python -m pkbs_mcp_server.server [config_file_path]
+```
+
+If no config file is specified, it will use `config.json` in the current directory.
+
+## MCP Resources
+
+The server exposes notes as resources with URIs in the format: `note://<note-id>`
+
+### Resource Operations
+- **List Resources**: `list_resources()` returns all available notes
+- **Read Resource**: `read_resource(uri)` returns the note content for a specific note URI
+
+## MCP Tools
+
+The server provides the following tools:
+
+- `create_note(title, content, tags)`:
+  - Create a new note with the specified title, content, and tags
+  - Example: `{ "name": "create_note", "arguments": { "title": "My Note", "content": "Note content", "tags": ["python", "tutorial"] } }`
+
+- `get_note(note_id)`:
+  - Retrieve a note by its ID
+  - Example: `{ "name": "get_note", "arguments": { "note_id": "abc-123" } }`
+
+- `update_note(note_id, title, content, tags)`:
+  - Update an existing note
+  - Example: `{ "name": "update_note", "arguments": { "note_id": "abc-123", "title": "Updated Title", "content": "Updated content" } }`
+
+- `delete_note(note_id)`:
+  - Delete a note by its ID
+  - Example: `{ "name": "delete_note", "arguments": { "note_id": "abc-123" } }`
+
+- `search_notes(query)`:
+  - Search notes by title or content
+  - Example: `{ "name": "search_notes", "arguments": { "query": "python" } }`
+
+- `list_notes(tag_filter)`:
+  - List all notes, optionally filtered by tag
+  - Example: `{ "name": "list_notes", "arguments": { "tag_filter": "python" } }`
+
+- `add_tag(note_id, tag)`:
+  - Add a tag to a note
+  - Example: `{ "name": "add_tag", "arguments": { "note_id": "abc-123", "tag": "important" } }`
+
+- `remove_tag(note_id, tag)`:
+  - Remove a tag from a note
+  - Example: `{ "name": "remove_tag", "arguments": { "note_id": "abc-123", "tag": "old" } }`
+
+## MCP Prompts
+
+The server provides the following prompts:
+
+- `summarize_notes_about(topic)`:
+  - Summarize notes about a specific topic
+  - Arguments: `{ "topic": "string" }`
+
+- `find_notes_by_tag(tag)`:
+  - Find notes by a specific tag
+  - Arguments: `{ "tag": "string" }`
+
+- `search_notes(query)`:
+  - Search notes for specific information
+  - Arguments: `{ "query": "string" }`
+
+## Usage Examples
+
+Here are some examples of how to interact with the server:
+
+### Creating a Note
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "create_note",
+    "arguments": {
+      "title": "Python Tips",
+      "content": "Here are some useful Python tips...",
+      "tags": ["python", "tips", "programming"]
+    }
+  }
+}
+```
+
+### Searching for Notes
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "search_notes",
+    "arguments": {
+      "query": "machine learning"
+    }
+  }
+}
+```
+
+### Getting a Specific Prompt
+```json
+{
+  "method": "prompts/get",
+  "params": {
+    "name": "summarize_notes_about",
+    "arguments": {
+      "topic": "data science"
+    }
+  }
+}
+```
+
+## Architecture
+
+### Components
+- **Server**: MCP server implementation using the official Python SDK
+- **Database**: SQLite-based storage with DatabaseManager
+- **Models**: Pydantic models for data validation
+- **Configuration**: Server configuration management
+
+### Data Model
+- **Note**: Contains ID, title, content, tags, and timestamps
+- **Database**: SQLite with tables for notes and tags
+
+## Development
+
+### Running Tests
+```bash
+python -m pytest tests/
+```
+
+### Test Files
+- `tests/test_database.py`: Database operations tests
+- `tests/test_server.py`: Server creation and basic functionality tests
+- `tests/test_tools.py`: MCP tools functionality tests
+- `tests/test_prompts.py`: MCP prompts functionality tests
+
+## Claude Desktop Integration
+
+To integrate with Claude Desktop, add the following to your Claude desktop configuration:
+
+```json
+{
+  "mcpServers": {
+    "pkb-mcp-server": {
+      "command": "python",
+      "args": ["-m", "pkbs_mcp_server.server"]
+    }
+  }
+}
+```
+
+## Project Structure
+
+```
+pkb-mcp-server/
+├── pkbs_mcp_server/          # Main package
+│   ├── __init__.py
+│   ├── server.py            # MCP server implementation
+│   ├── models.py            # Data models
+│   ├── database.py          # Database operations
+│   ├── config.py            # Configuration management
+│   └── utils.py             # Utility functions
+├── tests/                   # Test files
+│   ├── __init__.py
+│   ├── test_database.py
+│   ├── test_server.py
+│   ├── test_tools.py
+│   └── test_prompts.py
+├── config.json              # Default configuration
+├── requirements.txt         # Dependencies
+├── setup.py                 # Package setup
+├── README.md               # This file
+└── LICENSE
+```
+
+## License
+
+MIT
